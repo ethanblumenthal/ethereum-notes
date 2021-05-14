@@ -1,30 +1,27 @@
 pragma solidity 0.8.4;
 
-import "./ownable.sol"
-import "./destroyable.sol";
+import "./ownable.sol";
 
-contract Bank is Ownable, Destroyable {
+// interface defines function header of external functions
+interface GovernmentInterface {
+    function addTransaction(address _from, address _to, uint _amount) external payable;
+}
+
+// is keyword allows for inheritance
+contract Bank is Ownable {
+    // smart contract address holds funds and exposes external functions
+    GovernmentInterface governmentInstance = GovernmentInterface(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4);
+    
     // storage - permanent storage of data (state variables)
     // memory - temporary storage used in function execution
     // calldata - save arguments/inputs to our functions
     // complex ds - strings, arrays, mappings, structs
-    
     mapping(address => uint) balance;
-    address owner;
+    
     // events are used for logging to the evm
     // and gives frontends the ability to hook into changes
     // indexed parameter allows logs to be searchable over time
     event depositDone(uint indexed amount, address indexed depositedTo);
-    
-    // modifiers are similar to middlewares or decorators
-    modifier onlyOwner {
-        require(msg.sender == owner);
-        _; // run the function
-    }
-    
-    constructor() {
-        owner = msg.sender;
-    }
     
     // payble keyword lets the function receive money
     function deposit() public payable returns(uint) {
@@ -33,7 +30,7 @@ contract Bank is Ownable, Destroyable {
         return balance[msg.sender];
     }
     
-    function withdraw(uint amount) public returns (uint) {
+    function withdraw(uint amount) public onlyOwner returns (uint) {
         require(balance[msg.sender] >= amount);
         balance[msg.sender] -= amount;
         
@@ -46,12 +43,19 @@ contract Bank is Ownable, Destroyable {
         return balance[msg.sender];
     }
     
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+    
     function transfer(address recipient, uint amount) public {
         require(balance[msg.sender] >= amount, "Balance not sufficient");
         require(msg.sender != recipient, "Don't transfer money to yourself");
         
         uint previousSenderBalance = balance[msg.sender];
         _transfer(msg.sender, recipient, amount);
+        
+        // value lets a contract send money to an external contract
+        governmentInstance.addTransaction{value: 1 ether}(msg.sender, recipient, amount);
         
         assert(balance[msg.sender] == previousSenderBalance - amount);
     }
