@@ -1,8 +1,9 @@
 pragma solidity 0.8.4;
 
 import "./ownable.sol"
+import "./destroyable.sol";
 
-contract Bank is Ownable {
+contract Bank is Ownable, Destroyable {
     // storage - permanent storage of data (state variables)
     // memory - temporary storage used in function execution
     // calldata - save arguments/inputs to our functions
