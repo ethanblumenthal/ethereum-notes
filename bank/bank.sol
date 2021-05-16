@@ -1,6 +1,7 @@
 pragma solidity 0.8.4;
 
 import "./ownable.sol";
+import "./SafeMath.sol";
 
 // interface defines function header of external functions
 interface GovernmentInterface {
@@ -9,8 +10,15 @@ interface GovernmentInterface {
 
 // is keyword allows for inheritance
 contract Bank is Ownable {
+    // uint always defaults to uint256
+    using SafeMath for uint;
+
     // smart contract address holds funds and exposes external functions
-    GovernmentInterface governmentInstance = GovernmentInterface(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4);
+    GovernmentInterface governmentInstance;
+    
+    constructor(address _address) {
+        governmentInstance = GovernmentInterface(_address);
+    }
     
     // storage - permanent storage of data (state variables)
     // memory - temporary storage used in function execution
@@ -35,7 +43,7 @@ contract Bank is Ownable {
         balance[msg.sender] -= amount;
         
         // msg.sender is an address
-        msg.sender.transfer(amount);
+        payable(msg.sender).transfer(amount);
         return balance[msg.sender];
     }
     

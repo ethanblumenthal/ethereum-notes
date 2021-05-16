@@ -4,7 +4,7 @@ import "./ownable.sol";
 
 contract Destroyable is Ownable {
     function destroy() public onlyOwner {
-        address payable reciever = msg.sender;
-        selfdestruct(reciever);
+        address reciever = msg.sender;
+        selfdestruct(payable(reciever));
     }
 }

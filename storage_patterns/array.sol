@@ -11,10 +11,10 @@ contract simpleList {
   EntityStruct[] public entityStructs;
 
   function newEntity(address entityAddress, uint entityData) public returns(EntityStruct memory) {
-    EntityStruct memory newEntity;
-    newEntity.entityAddress = entityAddress;
-    newEntity.entityData    = entityData;
-    entityStructs.push(newEntity);
+    EntityStruct memory entity;
+    entity.entityAddress = entityAddress;
+    entity.entityData    = entityData;
+    entityStructs.push(entity);
     return entityStructs[entityStructs.length - 1];
   }
 
